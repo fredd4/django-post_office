@@ -12,6 +12,10 @@ from django.utils.encoding import python_2_unicode_compatible
 from post_office.fields import CommaSeparatedEmailField
 
 from django.template import Context, Template
+try:
+    from djangocms_text_ckeditor.fields import HTMLField
+except:
+    HTMLField = None
 
 from jsonfield import JSONField
 from post_office import cache
@@ -180,8 +184,12 @@ class EmailTemplate(models.Model):
         verbose_name=_("Subject"), validators=[validate_template_syntax])
     content = models.TextField(blank=True,
         verbose_name=_("Content"), validators=[validate_template_syntax])
-    html_content = models.TextField(blank=True,
-        verbose_name=_("HTML content"), validators=[validate_template_syntax])
+    if HTMLField:
+        html_content = HTMLField(blank=True,
+            verbose_name=_("HTML content"), validators=[validate_template_syntax])
+    else:
+        html_content = models.TextField(blank=True,
+            verbose_name=_("HTML content"), validators=[validate_template_syntax])
     language = models.CharField(max_length=12, choices=settings.LANGUAGES,
         help_text=_("Render template in alternative language"),
         default='', blank=True)

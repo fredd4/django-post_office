@@ -20,6 +20,11 @@ from .logutils import setup_loghandlers
 
 logger = setup_loghandlers("INFO")
 
+def _add_doctype(msg):
+    if not u'<html' in msg:
+        msg = u"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+                <html><body>""" + msg + u'</body></html>'
+    return msg
 
 def create(sender, recipients=None, cc=None, bcc=None, subject='', message='',
            html_message='', context=None, scheduled_time=None, headers=None,
@@ -65,6 +70,7 @@ def create(sender, recipients=None, cc=None, bcc=None, subject='', message='',
         subject = Template(subject).render(_context)
         message = Template(message).render(_context)
         html_message = Template(html_message).render(_context)
+        html_message = _add_doctype(html_message)
 
         email = Email(
             from_email=sender,
